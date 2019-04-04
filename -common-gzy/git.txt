@@ -10,7 +10,7 @@ git init
 git add ./..
 git remote add origin https://github.com/gzhy0430/common-gzy.git
 
-git commit -m "commit"
+git commit -am "commit--a表示add"
 git push -u origin master
 
 
