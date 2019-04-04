@@ -1,0 +1,37 @@
+为什么JDK动态代理目标类实现接口数量不能超过65535
+--Class<?> cl = getProxyClass0(loader, intfs)
+if (interfaces.length > 65535) {
+    throw new IllegalArgumentException("interface limit exceeded");
+}
+Java虚拟机规范：
+字节码结构：内部不包含任何分隔符，无论字节顺序、数量都是严格规定的
+多字节数据按照Big-endian顺序(高位字节在地址最低位，低位字节在地址最高位)
+字节码文件中基本类型u1,u2,u4,u8分别代表1,2,4,8个字节
+Class文件总体格式：
+type        descriptor
+u4          magic
+u2          minor_version
+u2          major_version
+u2          constant_pool_count
+cp_info     canstant_pool[constant_pool_count - 1]
+u2          access_flags
+u2          this_class
+u2          super_class
+u2          interfaces_count
+u2          interfaces[interfaces_count]
+u2          fields_count
+filed_info  files[fields_count]
+u2          methods_count
+method_info methods[methods_count]
+u2          attributes_count
+attributes_info attributes[attributes_count]
+
+由以上第20行可知，接口数量类型为u2，对应无符号2个字节，16位即2^16-1=65536
+
+一个有效的class文件前四个字节为0xCAFEBABE--咖啡宝贝
+
+类装载机制，运行引擎机制
+JVM包括：方法区、堆、java栈、程序计数器、本地方法栈
+
+
+

@@ -1,0 +1,11 @@
+我的咕泡学号：GP018489
+
+##git查看本地代码和服务器代码差异
+
+##git同步服务器代码到本地
+
+##git提交本地修改后代码到服务器
+git commit -m "commit"
+git push -u origin master
+
+
