@@ -7,7 +7,7 @@
 ##git提交本地修改后代码到服务器
 
 git init
-git add ./..
+git add ./..    "添加文件到git"
 git remote add origin https://github.com/gzhy0430/common-gzy.git
 
 git commit -am "commit--a表示add"
