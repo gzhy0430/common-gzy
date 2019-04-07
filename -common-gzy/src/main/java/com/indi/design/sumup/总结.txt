@@ -1,5 +1,129 @@
 https://gper.gupaoedu.com/articleContent?id=701
 
 一句话总结学习过的设计模式(要精准)
+工厂模式：简单工厂，工厂方法(产品系列生产)，抽象工厂(多维Bean创建)
+单例模式：注册式单例、线程内单例。在类加载消耗性能，业务场景需要单例时候使用。
+原型模式：猴子猴孙千千万万，deepclone--不同对象，浅克隆--引用克隆
+代理模式：隐藏功能对象，对功能增强，通常切面使用。
+委派模式：任务下发，多级对象解耦
+策略模式：不同的算法实现：多数时候用来对好多if/else-if/switch封装
+模板模式：流程固定，抽象不同实现。
+适配器模式：兼容老代码的情况下，适配新功能(扩展或者适配)
+装饰器模式：IS-A，对Bean修饰，增强，对象不变。java.io使用很多
+观察者模式：通知、广播、异步通信模式。常用来做事件监听。有监听者和被监听者，还有监听回调函数
 
 列举SpringAOP、IOC、DI应用的代码片段
+SpringAOP: 两种方式：
+注解--老的方式
+<bean id="txManager"
+    class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+    <property name="sessionFactory" ref="sessionFactory" />
+</bean>
+<!--使用基于注解方式配置事务 -->
+<tx:annotation-driven transaction-manager="txManager" />
+@Transactional
+@Service
+public class AccountServiceImpl implements AccountService {
+    ........................
+}
+
+注解--新的方式
+@Aspect
+public class MyAspect {
+    /**
+     * 前置通知
+     */
+    @Before("execution(* com.indi.dao.UserDao.addUser(..))")
+    public void before(){
+        System.out.println("前置通知....");
+    }
+    /**
+     * 后置通知
+     * returnVal,切点方法执行后的返回值
+     */
+    @AfterReturning(value="execution(* com.indi.dao.UserDao.addUser(..))",returning = "returnVal")
+    public void AfterReturning(Object returnVal){
+        System.out.println("后置通知...."+returnVal);
+    }
+    /**
+     * 环绕通知
+     * @param joinPoint 可用于执行切点的类
+     * @return
+     * @throws Throwable
+     */
+    @Around("execution(* com.indi.dao.UserDao.addUser(..))")
+    public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
+        System.out.println("环绕通知前....");
+        Object obj= (Object) joinPoint.proceed();
+        System.out.println("环绕通知后....");
+        return obj;
+    }
+    /**
+     * 抛出通知
+     * @param e
+     */
+    @AfterThrowing(value="execution(* com.indi.dao.UserDao.addUser(..))",throwing = "e")
+    public void afterThrowable(Throwable e){
+        System.out.println("出现异常:msg="+e.getMessage());
+    }
+    /**
+     * 无论什么情况下都会执行的方法
+     */
+    @After(value="execution(* com.indi.dao.UserDao.addUser(..))")
+    public void after(){
+        System.out.println("最终通知....");
+    }
+}
+
+xml配置:
+<bean id="dataAuthAdvice" class="com.indi.common.aop.DataAuthAdvice">
+    <property name="dataMethods">
+        <list>
+            <value>list</value>
+            <value>query</value>
+            <value>find</value>
+            <value>dynamicQuery</value>
+        </list>
+    </property>
+</bean>
+<!-- 定义用户操作日志切入点和通知器 -->
+<aop:config proxy-target-class="true">
+    <aop:pointcut id="operatePoint"
+        expression="@annotation(com.indi.common.OperateLog)" />
+    <aop:pointcut id="dataPoint"
+        expression="execution(* com.szhtp..dao..*.*(..))" />
+    <aop:advisor pointcut-ref="operatePoint" id="logAdvisor"
+        advice-ref="operateLogAdvisor" />
+    <aop:advisor pointcut-ref="dataPoint" advice-ref="dataAuthAdvice" />
+</aop:config>
+
+IOC: 控制反转--Bean的创建交给Spring
+xml中配置Bean，通过构造方法创建Bean：
+<bean id="tom" class="com.indi.bean.IBean1"></bean>
+注解方式创建Bean
+<context:component-scan base-package="com.indi.beans" resource-pattern="*.class" />
+@Component
+public class MyDao implements IDao {
+    public void method1() {
+        ...
+    }
+}
+
+DI: 依赖注入--IOC的实现方式--给Bean的属性赋值
+注解方式依赖注入
+@Component
+public class MyAction {
+    @Resource IDao dao;
+    public void method1() {
+        ...
+    }
+}
+xml配置方式依赖注入
+<bean name="zhuhai" class="com.indi.entity.Address">
+    <property name="country" value="中国"></property>
+    <property name="city" value="珠海"></property>
+</bean>
+<bean id="tom" class="com.indi.entity.User">
+    <constructor-arg name="address" ref="zhuhai"></constructor-arg>
+    <constructor-arg name="username" value="tom"></constructor-arg>
+</bean>
